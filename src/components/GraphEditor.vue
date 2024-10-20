@@ -9,23 +9,8 @@
 <script lang="ts">
 import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
 import { LGraph, LGraphCanvas, LiteGraph, LGraphNode } from '@comfyorg/litegraph';
-
-// Register a custom node type
-LiteGraph.registerNodeType('demo/add', class AddNode extends LiteGraph.LGraphNode {
-  constructor() {
-    super();
-    this.title = 'Add';
-    this.addInput('A', 'number');
-    this.addInput('B', 'number');
-    this.addOutput('Sum', 'number');
-  }
-
-  onExecute() {
-    const A = this.getInputData(0) || 0;
-    const B = this.getInputData(1) || 0;
-    this.setOutputData(0, A + B);
-  }
-});
+import '../nodes/nodes.js';  // Import the custom nodes
+import workflowData from '../workflow.json';  // Import the workflow JSON
 
 export default defineComponent({
   name: 'GraphEditor',
@@ -56,6 +41,10 @@ export default defineComponent({
 
         graphCanvas.value = new LGraphCanvas(canvasElement, graph);
         graphCanvas.value.bindEvents();
+
+        // Load workflow from JSON
+        loadWorkflow(workflowData);
+
         graph.start();
 
         // Listen to node selection
@@ -73,25 +62,42 @@ export default defineComponent({
       });
     });
 
-    const addNode = () => {
-      const node = LiteGraph.createNode('demo/add');
+    const loadWorkflow = (data: any) => {
+      graph.clear();
+      data.nodes.forEach((nodeData: any) => {
+        const node = LiteGraph.createNode(nodeData.type);
+        if (node) {
+          node.configure(nodeData);
+          graph.add(node);
+        } else {
+          console.error(`Failed to create node of type: ${nodeData.type}`);
+        }
+      });
+      graph.configure(data);
+    };
+
+    const addNode = (type: string, config: any = {}) => {
+      const node = LiteGraph.createNode(type);
       if (node) {
-        node.pos = [200, 200];
+        node.configure(config);
         graph.add(node);
       }
     };
 
-    const removeSelectedNode = () => {
-      if (selectedNode.value) {
-        graph.remove(selectedNode.value);
-        selectedNode.value = null;
+    const removeNode = (nodeId: number) => {
+      const node = graph.getNodeById(nodeId);
+      if (node) {
+        graph.remove(node);
       }
     };
 
+    // Expose methods to parent components or external scripts
     return {
       canvas,
+      loadWorkflow,
       addNode,
-      removeSelectedNode
+      removeNode,
+      selectedNode
     };
   }
 });
@@ -99,29 +105,17 @@ export default defineComponent({
 
 <style scoped>
 .graph-editor {
-  display: flex;
-  flex-direction: column;
+  width: 100%;
   height: 100%;
 }
 
-.controls {
-  padding: 10px;
-  display: flex;
-  justify-content: center;
-}
-
 .graph-container {
-  flex: 1;
-  display: flex;
+  width: 100%;
+  height: 100%;
 }
 
 canvas {
-  flex: 1;
-  display: block;
-}
-
-button {
-  margin: 0 10px;
-  padding: 10px 20px;
+  width: 100%;
+  height: 100%;
 }
 </style>
