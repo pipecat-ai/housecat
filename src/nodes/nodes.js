@@ -1,7 +1,7 @@
 import { LiteGraph } from '@comfyorg/litegraph';
 
 // Set up global LiteGraph settings
-LiteGraph.CANVAS_GRID_SIZE = 20;
+LiteGraph.CANVAS_GRID_SIZE = 10000;
 LiteGraph.WIDGET_BGCOLOR = "#444444";
 LiteGraph.NODE_DEFAULT_COLOR = "#939"; // pink - title of node
 LiteGraph.NODE_DEFAULT_BGCOLOR = "#353535";
@@ -10,6 +10,7 @@ LiteGraph.NODE_DEFAULT_SHAPE = "box";
 LiteGraph.NODE_TEXT_COLOR = "#ffffff";
 LiteGraph.NODE_SELECTED_COLOR = "#ffffff";
 LiteGraph.NODE_SELECTED_BGCOLOR = "#555555";
+
 
 const FRAME_PROCESSORS = 'frame_processors';
 

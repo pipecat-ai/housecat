@@ -2,41 +2,83 @@
   "nodes": [
     {
       "id": 1,
-      "type": "basic/input",
+      "type": "frame_processors/transport_input_audio",
       "pos": [100, 200],
-      "size": [140, 26],
+      "size": [180, 60],
       "flags": {},
       "order": 0,
       "mode": 0,
-      "outputs": [{"name": "output", "type": "number", "links": [2]}],
-      "properties": {"value": 5}
+      "outputs": [{"name": "audio", "type": "audio", "links": [2]}],
+      "properties": {}
     },
     {
       "id": 2,
-      "type": "basic/process",
+      "type": "frame_processors/transcription",
       "pos": [400, 200],
-      "size": [140, 26],
+      "size": [180, 60],
       "flags": {},
       "order": 1,
       "mode": 0,
-      "inputs": [{"name": "input", "type": "number", "link": 2}],
-      "outputs": [{"name": "output", "type": "number", "links": [3]}],
-      "properties": {"operation": "+", "value": 3}
+      "inputs": [{"name": "audio", "type": "audio", "link": 2}],
+      "outputs": [{"name": "text", "type": "string", "links": [3]}],
+      "properties": {}
     },
     {
       "id": 3,
-      "type": "basic/output",
+      "type": "frame_processors/context_aggregator",
       "pos": [700, 200],
-      "size": [140, 26],
+      "size": [180, 60],
       "flags": {},
       "order": 2,
       "mode": 0,
-      "inputs": [{"name": "input", "type": "number", "link": 3}],
+      "inputs": [{"name": "text", "type": "string", "link": 3}],
+      "outputs": [{"name": "context", "type": "object", "links": [4]}],
+      "properties": {}
+    },
+    {
+      "id": 4,
+      "type": "frame_processors/llm",
+      "pos": [1000, 200],
+      "size": [180, 60],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [{"name": "context", "type": "object", "link": 4}],
+      "outputs": [{"name": "response", "type": "string", "links": [5]}],
+      "properties": {}
+    },
+    {
+      "id": 5,
+      "type": "frame_processors/text_to_speech",
+      "pos": [1300, 200],
+      "size": [180, 60],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [{"name": "text", "type": "string", "link": 5}],
+      "outputs": [{"name": "audio", "type": "audio", "links": [6]}],
+      "properties": {}
+    },
+    {
+      "id": 6,
+      "type": "frame_processors/transport_output_audio",
+      "pos": [1600, 200],
+      "size": [180, 60],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [{"name": "audio", "type": "audio", "link": 6}],
       "properties": {}
     }
   ],
   "links": [
-    [2, 1, 0, 2, 0, "number"],
-    [3, 2, 0, 3, 0, "number"]
-  ]
+    [2, 1, 0, 2, 0, "audio"],
+    [3, 2, 0, 3, 0, "string"],
+    [4, 3, 0, 4, 0, "object"],
+    [5, 4, 0, 5, 0, "string"],
+    [6, 5, 0, 6, 0, "audio"]
+  ],
+  "groups": [],
+  "config": {},
+  "version": 0.4
 }
