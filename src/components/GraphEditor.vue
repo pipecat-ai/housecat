@@ -7,17 +7,27 @@
 </template>
 
 <script lang="ts">
+
 import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
 import { LGraph, LGraphCanvas, LiteGraph, LGraphNode } from '@comfyorg/litegraph';
 
+LiteGraph.CANVAS_GRID_SIZE = 20;
+
+LiteGraph.WIDGET_BGCOLOR = "#blah"
+LiteGraph.NODE_DEFAULT_COLOR = "#939" // pink - title of node
+LGraphCanvas.DEFAULT_BACKGROUND_IMAGE = null;
+
+const TRANSPORT_INPUT_AUDIO_NODE= 'transport_input_audio_node';
+const FRAME_PROCESSORS= 'frame_processors';
+
 // Register a custom node type
-LiteGraph.registerNodeType('demo/add', class AddNode extends LiteGraph.LGraphNode {
+LiteGraph.registerNodeType(`${FRAME_PROCESSORS}/${TRANSPORT_INPUT_AUDIO_NODE}`, class AddNode extends LiteGraph.LGraphNode {
   constructor() {
     super();
-    this.title = 'Add';
+    this.title = TRANSPORT_INPUT_AUDIO_NODE;
     this.addInput('A', 'number');
     this.addInput('B', 'number');
-    this.addOutput('Sum', 'number');
+    this.addOutput('Audio', 'number');
   }
 
   onExecute() {
@@ -74,7 +84,7 @@ export default defineComponent({
     });
 
     const addNode = () => {
-      const node = LiteGraph.createNode('demo/add');
+      const node = LiteGraph.createNode(`${FRAME_PROCESSORS}/${TRANSPORT_INPUT_AUDIO_NODE}`);
       if (node) {
         node.pos = [200, 200];
         graph.add(node);
