@@ -41,7 +41,7 @@ export default defineComponent({
 
         graphCanvas.value = new LGraphCanvas(canvasElement, graph);
         graphCanvas.value.bindEvents();
-
+        console.log(graphCanvas)
         // Load workflow from JSON
         loadWorkflow(workflowData);
 
@@ -77,6 +77,7 @@ export default defineComponent({
     };
 
     const addNode = (type: string, config: any = {}) => {
+      console.log(LiteGraph)
       const node = LiteGraph.createNode(type);
       if (node) {
         node.configure(config);
