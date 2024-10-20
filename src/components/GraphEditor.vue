@@ -7,6 +7,10 @@
 </template>
 
 <script lang="ts">
+
+// affects back canvas
+window.devicePixelRatio = 1;
+
 import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
 import { LGraph, LGraphCanvas, LiteGraph, LGraphNode } from '@comfyorg/litegraph';
 import '../nodes/nodes.js';  // Import the custom nodes
