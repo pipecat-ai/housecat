@@ -41,7 +41,6 @@ export default defineComponent({
 
         graphCanvas.value = new LGraphCanvas(canvasElement, graph);
         graphCanvas.value.bindEvents();
-        console.log(graphCanvas)
         // Load workflow from JSON
         loadWorkflow(workflowData);
 
@@ -64,20 +63,37 @@ export default defineComponent({
 
     const loadWorkflow = (data: any) => {
       graph.clear();
+      
+      // Create nodes
+      const nodeMap = new Map();
       data.nodes.forEach((nodeData: any) => {
         const node = LiteGraph.createNode(nodeData.type);
         if (node) {
           node.configure(nodeData);
           graph.add(node);
+          nodeMap.set(nodeData.id, node);
         } else {
           console.error(`Failed to create node of type: ${nodeData.type}`);
         }
       });
-      graph.configure(data);
+
+      // Create links
+      data.links.forEach((linkData: any) => {
+        const [, originNodeId, originSlot, targetNodeId, targetSlot] = linkData;
+        const originNode = nodeMap.get(originNodeId);
+        const targetNode = nodeMap.get(targetNodeId);
+        
+        if (originNode && targetNode) {
+          originNode.connect(originSlot, targetNode, targetSlot);
+        } else {
+          console.error(`Failed to create link: ${linkData}`);
+        }
+      });
+
+      graph.setDirtyCanvas(true, true);
     };
 
     const addNode = (type: string, config: any = {}) => {
-      console.log(LiteGraph)
       const node = LiteGraph.createNode(type);
       if (node) {
         node.configure(config);

@@ -15,21 +15,10 @@ export default defineComponent({
     GraphEditor
   },
   setup() {
-    const graphEditor = ref(null);
-
-    // Example of how to use the exposed methods
-    const addCustomNode = () => {
-      graphEditor.value?.addNode('basic/input', { pos: [200, 300], properties: { value: 10 } });
-    };
-
-    const removeNodeById = (id: number) => {
-      graphEditor.value?.removeNode(id);
-    };
+    const graphEditor = ref<InstanceType<typeof GraphEditor> | null>(null);
 
     return {
-      graphEditor,
-      addCustomNode,
-      removeNodeById
+      graphEditor
     };
   }
 });
