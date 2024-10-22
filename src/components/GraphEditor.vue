@@ -45,8 +45,6 @@ export default defineComponent({
 
         graphCanvas.value = new LGraphCanvas(canvasElement, graph);
         graphCanvas.value.bindEvents();
-        // Load workflow from JSON
-        loadWorkflow(workflowData);
 
         graph.start();
 
@@ -54,6 +52,17 @@ export default defineComponent({
         graphCanvas.value.onNodeSelected = (node) => {
           selectedNode.value = node;
         };
+
+        ////////////////// test JSON
+        // Load workflow from JSON
+        loadWorkflow(workflowData);
+
+        // export the graph _to_ JSON
+        const outputJson = exportWorkflow(graph);
+
+        // Load workflow again, but from generated JSON
+        loadWorkflow(outputJson);
+        ////////////////// should be no difference between the two
       }
 
       // Initial canvas size update
@@ -66,6 +75,7 @@ export default defineComponent({
     });
 
     const loadWorkflow = (data: any) => {
+      console.log("_____GraphEditor.vue loadWorkflow")
       graph.clear();
       
       // Create nodes
@@ -97,6 +107,49 @@ export default defineComponent({
       graph.setDirtyCanvas(true, true);
     };
 
+    const exportWorkflow = (graph) => {
+      console.log("_____GraphEditor.vue exportWorkflow")
+      let linksArr = []
+      let theseNodes = []
+      for (let nn in graph.nodes) {
+        let n = graph.nodes[nn];
+        let tmp = {};
+        let asdf = JSON.stringify(n.properties);
+        tmp.id = n.id;
+        tmp.inputs = n.inputs;
+        tmp.pos = n.pos;
+        tmp.properties = n.properties;
+        tmp.type = n.type;
+
+        // const [, originNodeId, originSlot, targetNodeId, targetSlot] = linkData;
+        if (graph.links[nn]) {
+          linksArr.push([n.id,
+              graph.links[nn].origin_id,
+              graph.links[nn].origin_slot,
+              graph.links[nn].target_id,
+              graph.links[nn].target_slot,
+              graph.links[nn].type,
+            ])
+          }
+
+        theseNodes.push(tmp);
+      }
+
+      let outputJson = {
+        "nodes": [],
+        "links": [],
+        "groups": [],
+        "config": {},
+        "version": 0.4
+      }
+      outputJson.nodes = theseNodes;
+      outputJson.links = linksArr;
+
+      console.log("_____GraphEditor.vue exportWorkflow outputJson:", outputJson)
+      return outputJson;
+    };
+
+
     const addNode = (type: string, config: any = {}) => {
       const node = LiteGraph.createNode(type);
       if (node) {
@@ -118,7 +171,8 @@ export default defineComponent({
       loadWorkflow,
       addNode,
       removeNode,
-      selectedNode
+      selectedNode,
+      exportWorkflow
     };
   }
 });
