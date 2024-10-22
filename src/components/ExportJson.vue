@@ -19,35 +19,26 @@ export default defineComponent({
     }
   },
   setup() {
-    const store = useMainStore(); // Access the store
-    console.log("__button setup___store.graph ", store.graph)
+    const store = useMainStore();
 
-    // Function to call the sibling function in the store
     const callOutputJSON = () => {
-      console.log("______________callOutputJSON store.graph ", store.graph)
-      // console.log("_____store() ", store())
       const newjson = store.exportWorkflow(store.graph);
       downloadJSON(newjson);
-      console.log("_____newjson ", newjson)
     };
 
     const downloadJSON = (jsonData) => {
       const blob = new Blob([
           JSON.stringify(jsonData, null, 2)
-        ], 
+        ],
         { type: 'application/json' }
       );
 
-        // Step 3: Create a link element and simulate a click to trigger the download
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = `housecat-${Date.now()}.json`;
-
-        // // Append the link to the document body
-        // document.body.appendChild(link);
-
-        // Simulate the click event to trigger the download
         link.click();
+
+        store.loadWorkflow(jsonData); // test
     }
 
     return {
