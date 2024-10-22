@@ -4,7 +4,6 @@
       "id": 1,
       "type": "frames/audio_input",
       "pos": [100, 100],
-      "size": [180, 160],
       "properties": {
         "input_source": "daily",
         "daily_url": "YOUR_DAILY_URL",
@@ -15,7 +14,6 @@
       "id": 2,
       "type": "frame_processors/audio_input_transport",
       "pos": [350, 100],
-      "size": [180, 100],
       "properties": {
         "vad_enabled": true,
         "vad_audio_passthrough": true
@@ -25,7 +23,6 @@
       "id": 3,
       "type": "frame_processors/speech_to_text",
       "pos": [600, 100],
-      "size": [180, 120],
       "properties": {
         "model": "whisper-1",
         "language": "en",
@@ -36,7 +33,6 @@
       "id": 4,
       "type": "frames/text",
       "pos": [100, 300],
-      "size": [180, 140],
       "properties": {
         "text": "You are a helpful LLM in a WebRTC call. Your goal is to demonstrate your capabilities in a succinct way. Your output will be converted to audio so don't include special characters in your answers. Respond to what the user said in a creative and helpful way."
       }
@@ -45,7 +41,6 @@
       "id": 5,
       "type": "frame_processors/llm",
       "pos": [600, 300],
-      "size": [180, 260],
       "properties": {
         "model": "gpt-4",
         "api_key": "YOUR_OPENAI_API_KEY",
@@ -60,7 +55,6 @@
       "id": 6,
       "type": "frame_processors/text_to_speech",
       "pos": [850, 300],
-      "size": [180, 280],
       "properties": {
         "service": "cartesia",
         "model": "sonic-english",
@@ -78,7 +72,6 @@
       "id": 7,
       "type": "frame_processors/audio_output_transport",
       "pos": [1100, 300],
-      "size": [180, 180],
       "properties": {
         "audio_out_enabled": true,
         "audio_out_is_live": true,
