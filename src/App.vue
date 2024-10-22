@@ -1,7 +1,7 @@
 <!-- src/App.vue -->
 <template>
   <div id="app">
-    <ExportJson ref="exportJson" @click="onButtonClick"/>
+    <ExportJson ref="exportJson" @click="exportWorkflow"/>
     <GraphEditor ref="graphEditor" />
   </div>
 </template>
@@ -17,11 +17,17 @@ export default defineComponent({
     ExportJson,
     GraphEditor
   },
-  methods: {
-    onButtonClick() {
-      alert('Export JSON Button clicked!');
-    }
-  },
+  // methods: {
+  //   exportWorkflow(graph) {
+  //     console.log("_____GraphEditor ", GraphEditor)
+  //     console.log("_____GraphEditor.setup ", GraphEditor.setup)
+  //     console.log("_____GraphEditor.methods.siblingFunction ", GraphEditor.methods.siblingFunction)
+  //     GraphEditor.methods.siblingFunction()
+  //     // const j = GraphEditor.exportWorkflow(graph.nodes);
+  //     // console.log("______________________j ", j)
+  //     // alert('Export JSON Button clicked!');
+  //   }
+  // },
   setup() {
     const graphEditor = ref<InstanceType<typeof GraphEditor> | null>(null);
     const exportJson = ref<InstanceType<typeof ExportJson> | null>(null);
