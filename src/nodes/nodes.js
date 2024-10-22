@@ -36,7 +36,7 @@ class LLMNode extends LiteGraph.LGraphNode {
         this.addWidget("number", "Presence Penalty", this.properties.presence_penalty, (v) => { this.properties.presence_penalty = v; }, { min: -2, max: 2, step: 0.1 });
         this.addWidget("number", "Top P", this.properties.top_p, (v) => { this.properties.top_p = v; }, { min: 0, max: 1, step: 0.1 });
         
-        this.color = "#4A90E2";  // Blue
+        this.color = "rgb(250, 5, 10)";  // Blue
     }
 
     onExecute() {
@@ -61,7 +61,7 @@ class TextToSpeechNode extends LiteGraph.LGraphNode {
         this.title = "Text to Speech";
         this.addInput("text", "string");
         this.addOutput("audio", "audio");
-        this.color = getRandomColor();
+        this.color = "rgb(100,100,10)"
     }
 
     onExecute() {
@@ -353,7 +353,7 @@ class TextNode extends LiteGraph.LGraphNode {
             text: ""
         };
         
-        this.color = "#2ecc71";  // Green
+        this.color = "rgb(110, 250, 100)";  // Green
         this.resizable = true;
         this.size = [200, 100];  // Set an initial size
 
