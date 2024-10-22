@@ -13,6 +13,7 @@ window.devicePixelRatio = 1;
 
 import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
 import { LGraph, LGraphCanvas, LiteGraph, LGraphNode } from '@comfyorg/litegraph';
+import { useMainStore } from '../pinia';
 import '../nodes/nodes.js';  // Import the custom nodes
 import workflowData from '../workflow.json';  // Import the workflow JSON
 
@@ -23,6 +24,7 @@ export default defineComponent({
     const graph = new LGraph();
     const graphCanvas = ref<LGraphCanvas | null>(null);
     const selectedNode = ref<LGraphNode | null>(null);
+    const store = useMainStore(); // Access the store
 
     onMounted(() => {
       const updateCanvasSize = () => {
@@ -34,6 +36,7 @@ export default defineComponent({
             graphCanvas.value.resize();
           }
         }
+        store.graph = graph;
       };
 
       window.addEventListener('resize', updateCanvasSize);
@@ -47,6 +50,7 @@ export default defineComponent({
         graphCanvas.value.bindEvents();
 
         graph.start();
+        store.graph = graph;
 
         // Listen to node selection
         graphCanvas.value.onNodeSelected = (node) => {
@@ -64,6 +68,7 @@ export default defineComponent({
         loadWorkflow(outputJson);
         ////////////////// should be no difference between the two
       }
+      console.log("_____store.graph ", store.graph)
 
       // Initial canvas size update
       updateCanvasSize();
@@ -165,6 +170,8 @@ export default defineComponent({
       }
     };
 
+    store.exportWorkflow = exportWorkflow;
+
     // Expose methods to parent components or external scripts
     return {
       canvas,
@@ -174,7 +181,7 @@ export default defineComponent({
       selectedNode,
       exportWorkflow
     };
-  }
+  },
 });
 </script>
 
