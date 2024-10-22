@@ -57,18 +57,15 @@ export default defineComponent({
           selectedNode.value = node;
         };
 
-        ////////////////// test JSON
-        // Load workflow from JSON
-        loadWorkflow(workflowData);
-
-        // export the graph _to_ JSON
-        const outputJson = exportWorkflow(graph);
-
-        // Load workflow again, but from generated JSON
-        loadWorkflow(outputJson);
-        ////////////////// should be no difference between the two
+        // ////////////////// test JSON
+        // // Load workflow from JSON
+        // loadWorkflow(workflowData);
+        // // export the graph _to_ JSON
+        // const outputJson = exportWorkflow(graph);
+        // // Load workflow again, but from generated JSON
+        // loadWorkflow(outputJson);
+        // ////////////////// should be no difference between the two
       }
-      console.log("_____store.graph ", store.graph)
 
       // Initial canvas size update
       updateCanvasSize();
@@ -150,7 +147,7 @@ export default defineComponent({
       outputJson.nodes = theseNodes;
       outputJson.links = linksArr;
 
-      console.log("_____GraphEditor.vue exportWorkflow outputJson:", outputJson)
+      // console.log("_____GraphEditor.vue exportWorkflow outputJson:", outputJson)
       return outputJson;
     };
 
@@ -171,6 +168,7 @@ export default defineComponent({
     };
 
     store.exportWorkflow = exportWorkflow;
+    store.loadWorkflow = loadWorkflow;
 
     // Expose methods to parent components or external scripts
     return {
