@@ -1,6 +1,6 @@
-import { LiteGraph } from '@comfyorg/litegraph';
+import { LGraphNode } from '@comfyorg/litegraph';
 
-class TextToSpeechNode extends LiteGraph.LGraphNode {
+class TextToSpeechNode extends LGraphNode {
     constructor() {
         super();
         this.title = "Text to Speech";

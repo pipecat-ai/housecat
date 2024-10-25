@@ -1,6 +1,6 @@
-import { LiteGraph } from '@comfyorg/litegraph';
+import { LGraphNode } from '@comfyorg/litegraph';
 
-class LLMNode extends LiteGraph.LGraphNode {
+class LLMNode extends LGraphNode {
     constructor() {
         super();
         this.title = "LLM";
