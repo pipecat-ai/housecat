@@ -7,15 +7,21 @@
 </template>
 
 <script lang="ts">
-
 // affects back canvas
 window.devicePixelRatio = 1;
 
 import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
-import { LGraph, LGraphCanvas, LiteGraph, LGraphNode } from '@comfyorg/litegraph';
+import {
+  LGraph,
+  LGraphCanvas,
+  LiteGraph,
+  LGraphNode,
+  SerializedLGraphNode,
+} from '@comfyorg/litegraph';
 import { useMainStore } from '../pinia';
-import '../nodes/nodes.js';  // Import the custom nodes
-import workflowData from '../workflow.json';  // Import the workflow JSON
+import '../nodes/nodes.js'; // Import the custom nodes
+import workflowData from '../workflow.json'; // Import the workflow JSON
+import { Workflow, NodeData, LinkData } from '../types'; // Import the workflow types
 
 export default defineComponent({
   name: 'GraphEditor',
@@ -76,29 +82,33 @@ export default defineComponent({
       });
     });
 
-    const loadWorkflow = (data: any) => {
-      console.log("_____GraphEditor.vue loadWorkflow")
+    const loadWorkflow = (data: Workflow) => {
+      console.log('_____GraphEditor.vue loadWorkflow');
       graph.clear();
-      
+
       // Create nodes
-      const nodeMap = new Map();
-      data.nodes.forEach((nodeData: any) => {
-        const node = LiteGraph.createNode(nodeData.type);
-        if (node) {
-          node.configure(nodeData);
-          graph.add(node);
-          nodeMap.set(nodeData.id, node);
+      const nodeMap = new Map<number, LGraphNode>();
+      data.nodes.forEach((nodeData) => {
+        if (nodeData.type) {
+          const node = LiteGraph.createNode(nodeData.type);
+          if (node) {
+            node.configure(nodeData);
+            graph.add(node);
+            nodeMap.set(nodeData.id, node);
+          } else {
+            console.error(`Failed to create node of type: ${nodeData.type}`);
+          }
         } else {
-          console.error(`Failed to create node of type: ${nodeData.type}`);
+          console.error('Node type is not defined');
         }
       });
 
       // Create links
-      data.links.forEach((linkData: any) => {
+      data.links.forEach((linkData: LinkData) => {
         const [, originNodeId, originSlot, targetNodeId, targetSlot] = linkData;
         const originNode = nodeMap.get(originNodeId);
         const targetNode = nodeMap.get(targetNodeId);
-        
+
         if (originNode && targetNode) {
           originNode.connect(originSlot, targetNode, targetSlot);
         } else {
@@ -109,50 +119,56 @@ export default defineComponent({
       graph.setDirtyCanvas(true, true);
     };
 
-    const exportWorkflow = (graph) => {
-      console.log("_____GraphEditor.vue exportWorkflow")
-      let linksArr = []
-      let theseNodes = []
+    const exportWorkflow = (graph: LGraph): Workflow => {
+      console.log('_____GraphEditor.vue exportWorkflow');
+      let linksArr: LinkData[] = [];
+      let theseNodes: NodeData[] = [];
       for (let nn in graph.nodes) {
         let n = graph.nodes[nn];
-        let tmp = {};
-        let asdf = JSON.stringify(n.properties);
-        tmp.id = n.id;
-        tmp.inputs = n.inputs;
-        tmp.pos = n.pos;
-        tmp.properties = n.properties;
-        tmp.type = n.type;
+        let tmp: NodeData = {
+          id: n.id,
+          inputs: n.inputs,
+          pos: n.pos,
+          properties: n.properties,
+          type: n.type,
+          size: n.size,
+          flags: n.flags,
+          outputs: n.outputs,
+          mode: n.mode,
+          title: n.title,
+        };
 
-        // const [, originNodeId, originSlot, targetNodeId, targetSlot] = linkData;
         if (graph.links[nn]) {
-          linksArr.push([n.id,
-              graph.links[nn].origin_id,
-              graph.links[nn].origin_slot,
-              graph.links[nn].target_id,
-              graph.links[nn].target_slot,
-              graph.links[nn].type,
-            ])
-          }
+          linksArr.push([
+            n.id,
+            graph.links[nn].origin_id,
+            graph.links[nn].origin_slot,
+            graph.links[nn].target_id,
+            graph.links[nn].target_slot,
+            graph.links[nn].type,
+          ]);
+        }
 
         theseNodes.push(tmp);
       }
 
-      let outputJson = {
-        "nodes": [],
-        "links": [],
-        "groups": [],
-        "config": {},
-        "version": 0.4
-      }
+      let outputJson: Workflow = {
+        nodes: [],
+        links: [],
+        groups: [],
+        config: {},
+        version: 0.4,
+      };
       outputJson.nodes = theseNodes;
       outputJson.links = linksArr;
 
-      // console.log("_____GraphEditor.vue exportWorkflow outputJson:", outputJson)
       return outputJson;
     };
 
-
-    const addNode = (type: string, config: any = {}) => {
+    const addNode = (
+      type: string,
+      config: SerializedLGraphNode<LGraphNode>
+    ) => {
       const node = LiteGraph.createNode(type);
       if (node) {
         node.configure(config);
@@ -177,7 +193,7 @@ export default defineComponent({
       addNode,
       removeNode,
       selectedNode,
-      exportWorkflow
+      exportWorkflow,
     };
   },
 });
