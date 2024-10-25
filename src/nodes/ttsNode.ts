@@ -163,7 +163,7 @@ class TTSNode extends LGraphNode {
       // For now, we'll just simulate the output
       const simulatedAudio = {
         type: 'audio',
-        data: `simulated_audio_data_${this.properties.service}_${this.properties.language}`,
+        data: `simulated_audio_data_${textInput}_${this.properties.service}_${this.properties.language}`,
       };
       this.setOutputData(0, simulatedAudio);
 
