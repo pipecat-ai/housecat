@@ -21,7 +21,7 @@ import {
 import { useMainStore } from '../pinia';
 import '../nodes/nodes.js'; // Import the custom nodes
 import workflowData from '../workflow.json'; // Import the workflow JSON
-import { Workflow, NodeData, LinkData } from '../workflow'; // Import the workflow types
+import { Workflow, NodeData, LinkData } from '../types'; // Import the workflow types
 
 export default defineComponent({
   name: 'GraphEditor',

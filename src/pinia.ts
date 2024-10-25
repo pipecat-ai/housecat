@@ -1,6 +1,6 @@
 import { LGraph } from '@comfyorg/litegraph';
 import { defineStore } from 'pinia';
-import { exportWorkflowType, loadWorkflowType } from './workflow';
+import { exportWorkflowType, loadWorkflowType } from './types';
 
 export const useMainStore = defineStore('mainStore', {
   state: (): {

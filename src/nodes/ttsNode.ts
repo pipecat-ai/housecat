@@ -1,10 +1,6 @@
 import { LGraphNode } from '@comfyorg/litegraph';
 
-export enum ServiceType {
-  Cartesia = 'cartesia',
-  Deepgram = 'deepgram',
-  ElevenLabs = 'eleven_labs',
-}
+import { Language, TTSServiceType } from '../types';
 
 class TTSNode extends LGraphNode {
   constructor() {
@@ -14,7 +10,7 @@ class TTSNode extends LGraphNode {
     this.addOutput('audio', 'audio');
 
     this.properties = {
-      service: 'cartesia',
+      service: TTSServiceType.Cartesia,
       model: '',
       voice: '',
       language: 'en',
@@ -40,7 +36,7 @@ class TTSNode extends LGraphNode {
         this.properties.service = v;
         this.onServiceChange(v);
       },
-      { values: ['cartesia', 'deepgram', 'eleven_labs'] }
+      { values: [...Object.values(TTSServiceType)] }
     );
 
     this.addWidget('text', 'Model', this.properties.model, (v) => {
@@ -56,7 +52,7 @@ class TTSNode extends LGraphNode {
       (v) => {
         this.properties.language = v;
       },
-      { values: null /* TODO: add languageOptions */ }
+      { values: [...Object.values(Language)] }
     );
     this.addWidget(
       'number',
@@ -89,7 +85,7 @@ class TTSNode extends LGraphNode {
     this.onServiceChange(this.properties.service);
   }
 
-  onServiceChange(value: ServiceType) {
+  onServiceChange(value: TTSServiceType) {
     // Store the first 7 widgets (common widgets)
     const commonWidgets = this.widgets.slice(0, 7);
 
@@ -101,7 +97,7 @@ class TTSNode extends LGraphNode {
 
     // Add service-specific widgets
     switch (value) {
-      case ServiceType.Cartesia:
+      case TTSServiceType.Cartesia:
         this.addWidget(
           'text',
           'Cartesia API Key',
@@ -127,7 +123,7 @@ class TTSNode extends LGraphNode {
           }
         );
         break;
-      case ServiceType.Deepgram:
+      case TTSServiceType.Deepgram:
         this.addWidget(
           'text',
           'Deepgram API Key',
@@ -145,7 +141,7 @@ class TTSNode extends LGraphNode {
           }
         );
         break;
-      case ServiceType.ElevenLabs:
+      case TTSServiceType.ElevenLabs:
         this.addWidget(
           'text',
           'Eleven Labs API Key',

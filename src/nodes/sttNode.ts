@@ -1,5 +1,7 @@
 import { LGraphNode } from '@comfyorg/litegraph';
 
+import { Language } from '../types';
+
 class STTNode extends LGraphNode {
   constructor() {
     super();
@@ -23,7 +25,7 @@ class STTNode extends LGraphNode {
       (v) => {
         this.properties.language = v;
       },
-      { values: null /* TODO: languageOptions */ }
+      { values: [...Object.values(Language)] }
     );
     this.addWidget(
       'toggle',
