@@ -41,6 +41,7 @@ export enum Language {
   EnglishGB = 'en-GB',
   EnglishNZ = 'en-NZ',
   EnglishIN = 'en-IN',
+  Spanish = 'es',
   Estonian = 'et',
   Finnish = 'fi',
   DutchBelgium = 'nl-BE',
