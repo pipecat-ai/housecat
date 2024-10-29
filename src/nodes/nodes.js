@@ -227,7 +227,7 @@ class STTNode extends LiteGraph.LGraphNode {
         this.addWidget("combo", "Language", this.properties.language, (v) => { this.properties.language = v; }, { values: languageOptions });
         this.addWidget("toggle", "Audio Passthrough", this.properties.audio_passthrough, (v) => { this.properties.audio_passthrough = v; });
         
-        this.color = "#4A90E2";  // Blue
+        this.color = "rgb(200, 200, 30)";  // Blue
     }
 
     onExecute() {
