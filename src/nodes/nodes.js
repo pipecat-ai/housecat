@@ -1,7 +1,8 @@
 import { LiteGraph } from '@comfyorg/litegraph';
 
-const FRAME_PROCESSORS = 'frame_processors';
-const FRAMES = 'frames';
+const PROCESSORS = 'processors';
+const INPUTS = 'inputs';
+const OUTPUTS = 'outputs';
 
 // Helper function to generate random color
 function getRandomColor() {
@@ -20,7 +21,6 @@ class LLMNode extends LiteGraph.LGraphNode {
         
         this.properties = {
             model: "gpt-4",
-            api_key: "",
             temperature: 0.7,
             max_tokens: 150,
             frequency_penalty: 0,
@@ -29,14 +29,13 @@ class LLMNode extends LiteGraph.LGraphNode {
         };
         
         this.addWidget("combo", "Model", this.properties.model, (v) => { this.properties.model = v; }, { values: ["gpt-3.5-turbo", "gpt-4", "gpt-4-turbo"] });
-        this.addWidget("text", "API Key", this.properties.api_key, (v) => { this.properties.api_key = v; });
         this.addWidget("number", "Temperature", this.properties.temperature, (v) => { this.properties.temperature = v; }, { min: 0, max: 1, step: 0.1 });
         this.addWidget("number", "Max Tokens", this.properties.max_tokens, (v) => { this.properties.max_tokens = v; }, { min: 1, max: 4096, step: 1 });
         this.addWidget("number", "Frequency Penalty", this.properties.frequency_penalty, (v) => { this.properties.frequency_penalty = v; }, { min: -2, max: 2, step: 0.1 });
         this.addWidget("number", "Presence Penalty", this.properties.presence_penalty, (v) => { this.properties.presence_penalty = v; }, { min: -2, max: 2, step: 0.1 });
         this.addWidget("number", "Top P", this.properties.top_p, (v) => { this.properties.top_p = v; }, { min: 0, max: 1, step: 0.1 });
         
-        this.color = "rgb(250, 5, 10)";  // Blue
+        this.color = "rgb(250, 5, 10)";
     }
 
     onExecute() {
@@ -52,7 +51,7 @@ class LLMNode extends LiteGraph.LGraphNode {
     }
 }
 
-LiteGraph.registerNodeType(`${FRAME_PROCESSORS}/llm`, LLMNode);
+LiteGraph.registerNodeType(`${PROCESSORS}/llm`, LLMNode);
 
 // Text to Speech Node
 class TextToSpeechNode extends LiteGraph.LGraphNode {
@@ -70,7 +69,7 @@ class TextToSpeechNode extends LiteGraph.LGraphNode {
         this.setOutputData(0, { type: "audio", data: "synthesized_audio_data" });
     }
 }
-LiteGraph.registerNodeType(`${FRAME_PROCESSORS}/text_to_speech`, TextToSpeechNode);
+LiteGraph.registerNodeType(`${PROCESSORS}/text_to_speech`, TextToSpeechNode);
 
 // Audio Input Node
 class AudioInputNode extends LiteGraph.LGraphNode {
@@ -80,127 +79,107 @@ class AudioInputNode extends LiteGraph.LGraphNode {
         this.addOutput("audio", "audio");
         
         this.properties = {
-            input_source: "local",
-            sample_rate: 16000,
-            channels: 1,
-            livekit_url: "",
-            livekit_token: "",
-            daily_url: "",
-            daily_token: ""
+            input_source: "daily",
+            audio_in_enabled: true,
+            vad_enabled: false,
+            vad_audio_passthrough: false
         };
         
         this.addWidget("combo", "Input Source", this.properties.input_source, (v) => { 
             this.properties.input_source = v;
-            this.onInputSourceChange(v);
         }, { values: ["local", "livekit", "daily"] });
+
+        // Common settings
+        this.addWidget("toggle", "Audio In Enabled", this.properties.audio_in_enabled, (v) => { this.properties.audio_in_enabled = v; });
+        this.addWidget("toggle", "VAD Enabled", this.properties.vad_enabled, (v) => { this.properties.vad_enabled = v; });
+        this.addWidget("toggle", "VAD Audio Passthrough", this.properties.vad_audio_passthrough, (v) => { this.properties.vad_audio_passthrough = v; });
         
         this.color = "#4B0082";  // Indigo
-        
-        this.onInputSourceChange(this.properties.input_source);
     }
 
-    onInputSourceChange(value) {
-        // Store the first widget (Input Source)
-        const inputSourceWidget = this.widgets[0];
+    onExecute() {
+        this.setOutputData(0, { type: "audio", data: "simulated_audio_data", source: this.properties.input_source });
+    }
+}
+
+LiteGraph.registerNodeType(`${INPUTS}/audio_input`, AudioInputNode);
+
+// Text Input Node
+class TextInputNode extends LiteGraph.LGraphNode {
+    constructor() {
+        super();
+        this.title = "Text Input";
+        this.addOutput("text", "string");
+        
+        this.properties = {
+            text: ""
+        };
+        
+        this.addWidget("text", "Text", this.properties.text, (v) => { 
+            this.properties.text = v;
+        });
+        
+        this.color = "#2ecc71";  // Green
+    }
+
+    onExecute() {
+        this.setOutputData(0, this.properties.text);
+    }
+}
+
+LiteGraph.registerNodeType(`${INPUTS}/text_input`, TextInputNode);
+
+// Audio Output Node
+class AudioOutputNode extends LiteGraph.LGraphNode {
+    constructor() {
+        super();
+        this.title = "Audio Output";
+        this.addInput("audio", "audio");
+        
+        this.properties = {
+            output_source: "daily",
+            audio_out_enabled: true,
+            audio_out_is_live: true,
+            audio_out_bitrate: 96000
+        };
+        
+        this.addWidget("combo", "Output Source", this.properties.output_source, (v) => { 
+            this.properties.output_source = v;
+            this.onOutputSourceChange(v);
+        }, { values: ["local", "livekit", "daily"] });
+
+        // Common settings
+        this.addWidget("toggle", "Audio Out Enabled", this.properties.audio_out_enabled, (v) => { this.properties.audio_out_enabled = v; });
+        this.addWidget("toggle", "Is Live", this.properties.audio_out_is_live, (v) => { this.properties.audio_out_is_live = v; });
+        this.addWidget("number", "Bitrate", this.properties.audio_out_bitrate, (v) => { this.properties.audio_out_bitrate = v; }, { min: 8000, max: 320000, step: 1000 });
+        
+        this.color = "#27ae60";
+        
+        this.onOutputSourceChange(this.properties.output_source);
+    }
+
+    onOutputSourceChange(value) {
+        // Store the first 4 widgets (common widgets)
+        const commonWidgets = this.widgets.slice(0, 4);
         
         // Clear all widgets
         this.widgets = [];
         
-        // Re-add the Input Source widget
-        this.widgets.push(inputSourceWidget);
-
-        // Add widgets based on the selected input source
-        switch (value) {
-            case "local":
-                this.addWidget("number", "Sample Rate", this.properties.sample_rate, (v) => { this.properties.sample_rate = v; }, { min: 8000, max: 48000, step: 100 });
-                this.addWidget("number", "Channels", this.properties.channels, (v) => { this.properties.channels = v; }, { min: 1, max: 2, step: 1 });
-                break;
-            case "livekit":
-                this.addWidget("text", "LiveKit URL", this.properties.livekit_url, (v) => { this.properties.livekit_url = v; });
-                this.addWidget("text", "LiveKit Token", this.properties.livekit_token, (v) => { this.properties.livekit_token = v; });
-                break;
-            case "daily":
-                this.addWidget("text", "Daily URL", this.properties.daily_url, (v) => { this.properties.daily_url = v; });
-                this.addWidget("text", "Daily Token", this.properties.daily_token, (v) => { this.properties.daily_token = v; });
-                break;
-        }
+        // Re-add the common widgets
+        this.widgets.push(...commonWidgets);
 
         this.setDirtyCanvas(true, true);
     }
 
     onExecute() {
-        // In a real implementation, this would process incoming audio
-        // and push it to the output. Here, we're just simulating the interface.
-        this.setOutputData(0, { type: "audio", data: "simulated_audio_data", source: this.properties.input_source });
-    }
-}
-
-LiteGraph.registerNodeType(`${FRAMES}/audio_input`, AudioInputNode);
-
-// Audio Input Transport Node
-class AudioInputTransportNode extends LiteGraph.LGraphNode {
-    constructor() {
-        super();
-        this.title = "Audio Input Transport";
-        this.addInput("audio", "audio");
-        this.addOutput("audio", "audio");
-        this.addOutput("vad", "vad");
-        
-        this.addProperty("vad_enabled", false);
-        this.addProperty("vad_audio_passthrough", false);
-        
-        this.addWidget("toggle", "VAD Enabled", this.properties.vad_enabled, (v) => { this.properties.vad_enabled = v; });
-        this.addWidget("toggle", "VAD Audio Passthrough", this.properties.vad_audio_passthrough, (v) => { this.properties.vad_audio_passthrough = v; });
-        
-        this.color = "#2980b9";
-    }
-
-    onExecute() {
         const audioInput = this.getInputData(0);
         if (audioInput) {
-            this.setOutputData(0, audioInput);
-            if (this.properties.vad_enabled) {
-                this.setOutputData(1, { type: "vad", state: "QUIET" });
-            }
+            console.log("Processing audio output:", audioInput, "to source:", this.properties.output_source);
         }
     }
 }
 
-LiteGraph.registerNodeType(`${FRAME_PROCESSORS}/audio_input_transport`, AudioInputTransportNode);
-
-// Audio Output Transport Node
-class AudioOutputTransportNode extends LiteGraph.LGraphNode {
-    constructor() {
-        super();
-        this.title = "Audio Output Transport";
-        this.addInput("audio", "audio");
-        
-        this.addProperty("audio_out_enabled", true);
-        this.addProperty("audio_out_is_live", false);
-        this.addProperty("audio_out_sample_rate", 16000);
-        this.addProperty("audio_out_channels", 1);
-        this.addProperty("audio_out_bitrate", 96000);
-        
-        this.addWidget("toggle", "Audio Out Enabled", this.properties.audio_out_enabled, (v) => { this.properties.audio_out_enabled = v; });
-        this.addWidget("toggle", "Is Live", this.properties.audio_out_is_live, (v) => { this.properties.audio_out_is_live = v; });
-        this.addWidget("number", "Sample Rate", this.properties.audio_out_sample_rate, (v) => { this.properties.audio_out_sample_rate = v; }, { min: 8000, max: 48000, step: 100 });
-        this.addWidget("number", "Channels", this.properties.audio_out_channels, (v) => { this.properties.audio_out_channels = v; }, { min: 1, max: 2, step: 1 });
-        this.addWidget("number", "Bitrate", this.properties.audio_out_bitrate, (v) => { this.properties.audio_out_bitrate = v; }, { min: 8000, max: 320000, step: 1000 });
-        
-        this.color = "#27ae60";
-    }
-
-    onExecute() {
-        const audioInput = this.getInputData(0);
-        if (audioInput) {
-            // In a real implementation, this would process the audio
-            // and send it to the output transport. Here, we're just simulating the interface.
-            console.log("Simulated audio output:", audioInput);
-        }
-    }
-}
-
-LiteGraph.registerNodeType(`${FRAME_PROCESSORS}/audio_output_transport`, AudioOutputTransportNode);
+LiteGraph.registerNodeType(`${OUTPUTS}/audio_output`, AudioOutputNode);
 
 // Language options
 const languageOptions = [
@@ -218,24 +197,41 @@ class STTNode extends LiteGraph.LGraphNode {
         this.addOutput("text", "string");
         
         this.properties = {
-            model: "",
+            service: "deepgram",
             language: "en",
             audio_passthrough: false
         };
         
-        this.addWidget("text", "Model", this.properties.model, (v) => { this.properties.model = v; });
+        this.addWidget("combo", "Service", this.properties.service, (v) => { 
+            this.properties.service = v;
+            this.onServiceChange(v);
+        }, { values: ["deepgram", "whisper", "azure"] });
+        
         this.addWidget("combo", "Language", this.properties.language, (v) => { this.properties.language = v; }, { values: languageOptions });
         this.addWidget("toggle", "Audio Passthrough", this.properties.audio_passthrough, (v) => { this.properties.audio_passthrough = v; });
         
-        this.color = "rgb(200, 200, 30)";  // Blue
+        this.color = "rgb(200, 200, 30)";
+        
+        this.onServiceChange(this.properties.service);
+    }
+
+    onServiceChange(value) {
+        // Store the first 3 widgets (common widgets)
+        const commonWidgets = this.widgets.slice(0, 3);
+        
+        // Clear all widgets
+        this.widgets = [];
+        
+        // Re-add the common widgets
+        this.widgets.push(...commonWidgets);
+
+        this.setDirtyCanvas(true, true);
     }
 
     onExecute() {
         const audioInput = this.getInputData(0);
         if (audioInput) {
-            // In a real implementation, this would make an API call to the STT service
-            // For now, we'll just simulate the output
-            const simulatedText = `Simulated transcription of audio input (${this.properties.language})`;
+            const simulatedText = `Simulated transcription of audio input using ${this.properties.service} (${this.properties.language})`;
             this.setOutputData(0, simulatedText);
             
             if (this.properties.audio_passthrough) {
@@ -246,7 +242,7 @@ class STTNode extends LiteGraph.LGraphNode {
     }
 }
 
-LiteGraph.registerNodeType(`${FRAME_PROCESSORS}/speech_to_text`, STTNode);
+LiteGraph.registerNodeType(`${PROCESSORS}/speech_to_text`, STTNode);
 
 // Text-to-Speech (TTS) Node
 class TTSNode extends LiteGraph.LGraphNode {
@@ -258,21 +254,9 @@ class TTSNode extends LiteGraph.LGraphNode {
         
         this.properties = {
             service: "cartesia",
-            model: "",
-            voice: "",
             language: "en",
-            sample_rate: 16000,
             aggregate_sentences: true,
-            push_text_frames: true,
-            // Cartesia specific
-            cartesia_api_key: "",
-            cartesia_version: "2024-06-10",
-            cartesia_url: "wss://api.cartesia.ai/tts/websocket",
-            // Deepgram specific
-            deepgram_api_key: "",
-            deepgram_encoding: "linear16",
-            // Eleven Labs specific (placeholder)
-            eleven_labs_api_key: ""
+            push_text_frames: true
         };
         
         this.addWidget("combo", "Service", this.properties.service, (v) => { 
@@ -280,10 +264,7 @@ class TTSNode extends LiteGraph.LGraphNode {
             this.onServiceChange(v);
         }, { values: ["cartesia", "deepgram", "eleven_labs"] });
         
-        this.addWidget("text", "Model", this.properties.model, (v) => { this.properties.model = v; });
-        this.addWidget("text", "Voice", this.properties.voice, (v) => { this.properties.voice = v; });
         this.addWidget("combo", "Language", this.properties.language, (v) => { this.properties.language = v; }, { values: languageOptions });
-        this.addWidget("number", "Sample Rate", this.properties.sample_rate, (v) => { this.properties.sample_rate = v; }, { min: 8000, max: 48000, step: 100 });
         this.addWidget("toggle", "Aggregate Sentences", this.properties.aggregate_sentences, (v) => { this.properties.aggregate_sentences = v; });
         this.addWidget("toggle", "Push Text Frames", this.properties.push_text_frames, (v) => { this.properties.push_text_frames = v; });
         
@@ -293,8 +274,8 @@ class TTSNode extends LiteGraph.LGraphNode {
     }
 
     onServiceChange(value) {
-        // Store the first 7 widgets (common widgets)
-        const commonWidgets = this.widgets.slice(0, 7);
+        // Store the first 4 widgets (common widgets)
+        const commonWidgets = this.widgets.slice(0, 4);
         
         // Clear all widgets
         this.widgets = [];
@@ -302,30 +283,12 @@ class TTSNode extends LiteGraph.LGraphNode {
         // Re-add the common widgets
         this.widgets.push(...commonWidgets);
 
-        // Add service-specific widgets
-        switch (value) {
-            case "cartesia":
-                this.addWidget("text", "Cartesia API Key", this.properties.cartesia_api_key, (v) => { this.properties.cartesia_api_key = v; });
-                this.addWidget("text", "Cartesia Version", this.properties.cartesia_version, (v) => { this.properties.cartesia_version = v; });
-                this.addWidget("text", "Cartesia URL", this.properties.cartesia_url, (v) => { this.properties.cartesia_url = v; });
-                break;
-            case "deepgram":
-                this.addWidget("text", "Deepgram API Key", this.properties.deepgram_api_key, (v) => { this.properties.deepgram_api_key = v; });
-                this.addWidget("text", "Deepgram Encoding", this.properties.deepgram_encoding, (v) => { this.properties.deepgram_encoding = v; });
-                break;
-            case "eleven_labs":
-                this.addWidget("text", "Eleven Labs API Key", this.properties.eleven_labs_api_key, (v) => { this.properties.eleven_labs_api_key = v; });
-                break;
-        }
-
         this.setDirtyCanvas(true, true);
     }
 
     onExecute() {
         const textInput = this.getInputData(0);
         if (textInput) {
-            // In a real implementation, this would make an API call to the selected TTS service
-            // For now, we'll just simulate the output
             const simulatedAudio = { 
                 type: "audio", 
                 data: `simulated_audio_data_${this.properties.service}_${this.properties.language}` 
@@ -340,76 +303,4 @@ class TTSNode extends LiteGraph.LGraphNode {
     }
 }
 
-LiteGraph.registerNodeType(`${FRAME_PROCESSORS}/text_to_speech`, TTSNode);
-
-// Text Node
-class TextNode extends LiteGraph.LGraphNode {
-    constructor() {
-        super();
-        this.title = "Text";
-        this.addOutput("text", "string");
-        
-        this.properties = {
-            text: ""
-        };
-        
-        this.color = "rgb(110, 250, 100)";  // Green
-        this.resizable = true;
-        this.size = [200, 100];  // Set an initial size
-
-        this.createTextWidget();
-    }
-
-    createTextWidget() {
-        const widget = this.addWidget("text", "Text", this.properties.text, (v) => {
-            this.properties.text = v;
-        });
-        widget.customWidget = this.createTextArea.bind(this);
-        this.textWidget = widget;
-    }
-
-    createTextArea(widget, value) {
-        const element = document.createElement("textarea");
-        element.className = "text-node-textarea";
-        element.value = value;
-        element.style.width = "100%";
-        element.style.height = "100%";
-        element.addEventListener("input", () => {
-            this.properties.text = element.value;
-            widget.value = element.value;
-        });
-        return element;
-    }
-
-    onResize(size) {
-        if (this.textWidget && this.textWidget.customWidget) {
-            const element = this.textWidget.customWidget(this.textWidget, this.textWidget.value);
-            element.style.width = (size[0] - 20) + "px";
-            element.style.height = (size[1] - 40) + "px";
-        }
-    }
-
-    onExecute() {
-        this.setOutputData(0, this.properties.text);
-    }
-
-    // Serialize the node data
-    serialize() {
-        const data = super.serialize();
-        data.properties = { text: this.properties.text };
-        return data;
-    }
-
-    // Deserialize and configure the node
-    configure(data) {
-        super.configure(data);
-        if (data.properties && data.properties.text) {
-            this.properties.text = data.properties.text;
-            if (this.textWidget) {
-                this.textWidget.value = this.properties.text;
-            }
-        }
-    }
-}
-
-LiteGraph.registerNodeType(`${FRAMES}/text`, TextNode);
+LiteGraph.registerNodeType(`${PROCESSORS}/text_to_speech`, TTSNode);
