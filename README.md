@@ -5,26 +5,13 @@ Housecat is the front end for pipecat. WIP.
 
 1. Transport Input Node (Audio)
 2. Transcription Node (STT)
-3. --- Context Aggregator ---
 4. LLM Node 
 5. Text to Speech Node
 6. Transport Output Node (Audio) 
 
------
-
-# Low Expectation MVP 
- 
-No link to python
-
-# Expectation MVP 
-
-Link to python 
-----
 
 TODO: 
-- [ ] Run pipecat 
-- [ ] Setup hello world litegraph.js 
-- [ ] Create the nodes that are needed for MVP
+- [ ] Multiline text node 
 
 ## Setup
 
@@ -35,3 +22,7 @@ TODO:
 ## Dependencies
 
 - litegraph.js
+
+
+# Contributing to HouseCat
+https://www.loom.com/share/204d65fb31164a4eaa8da264ee4874b4?sid=fa795835-2c4a-45eb-8f89-468b7cc0b8ec 

@@ -49,6 +49,9 @@ export default defineComponent({
         graphCanvas.value = new LGraphCanvas(canvasElement, graph);
         graphCanvas.value.bindEvents();
 
+        // Load workflow from JSON immediately after canvas initialization
+        loadWorkflow(workflowData);
+
         graph.start();
         store.graph = graph;
 
@@ -56,15 +59,6 @@ export default defineComponent({
         graphCanvas.value.onNodeSelected = (node) => {
           selectedNode.value = node;
         };
-
-        // ////////////////// test JSON
-        // // Load workflow from JSON
-        // loadWorkflow(workflowData);
-        // // export the graph _to_ JSON
-        // const outputJson = exportWorkflow(graph);
-        // // Load workflow again, but from generated JSON
-        // loadWorkflow(outputJson);
-        // ////////////////// should be no difference between the two
       }
 
       // Initial canvas size update

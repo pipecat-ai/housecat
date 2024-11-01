@@ -2,48 +2,43 @@
   "nodes": [
     {
       "id": 1,
-      "type": "frames/audio_input",
+      "type": "inputs/audio_input",
       "pos": [100, 100],
+      "size": [180, 160],
       "properties": {
         "input_source": "daily",
-        "daily_url": "YOUR_DAILY_URL",
-        "daily_token": "YOUR_DAILY_TOKEN"
-      }
-    },
-    {
-      "id": 2,
-      "type": "frame_processors/audio_input_transport",
-      "pos": [350, 100],
-      "properties": {
+        "audio_in_enabled": true,
         "vad_enabled": true,
         "vad_audio_passthrough": true
       }
     },
     {
-      "id": 3,
-      "type": "frame_processors/speech_to_text",
-      "pos": [600, 100],
+      "id": 2,
+      "type": "processors/speech_to_text",
+      "pos": [400, 100],
+      "size": [180, 120],
       "properties": {
-        "model": "whisper-1",
+        "service": "deepgram",
         "language": "en",
         "audio_passthrough": false
       }
     },
     {
-      "id": 4,
-      "type": "frames/text",
+      "id": 3,
+      "type": "inputs/text_input",
       "pos": [100, 300],
+      "size": [180, 100],
       "properties": {
         "text": "You are a helpful LLM in a WebRTC call. Your goal is to demonstrate your capabilities in a succinct way. Your output will be converted to audio so don't include special characters in your answers. Respond to what the user said in a creative and helpful way."
       }
     },
     {
-      "id": 5,
-      "type": "frame_processors/llm",
-      "pos": [600, 300],
+      "id": 4,
+      "type": "processors/llm",
+      "pos": [400, 300],
+      "size": [180, 260],
       "properties": {
         "model": "gpt-4",
-        "api_key": "YOUR_OPENAI_API_KEY",
         "temperature": 0.7,
         "max_tokens": 150,
         "frequency_penalty": 0,
@@ -52,42 +47,36 @@
       }
     },
     {
-      "id": 6,
-      "type": "frame_processors/text_to_speech",
-      "pos": [850, 300],
+      "id": 5,
+      "type": "processors/text_to_speech",
+      "pos": [700, 300],
+      "size": [180, 160],
       "properties": {
         "service": "cartesia",
-        "model": "sonic-english",
-        "voice": "79a125e8-cd45-4c13-8a67-188112f4dd22",
         "language": "en",
-        "sample_rate": 16000,
         "aggregate_sentences": true,
-        "push_text_frames": true,
-        "cartesia_api_key": "YOUR_CARTESIA_API_KEY",
-        "cartesia_version": "2024-06-10",
-        "cartesia_url": "wss://api.cartesia.ai/tts/websocket"
+        "push_text_frames": true
       }
     },
     {
-      "id": 7,
-      "type": "frame_processors/audio_output_transport",
-      "pos": [1100, 300],
+      "id": 6,
+      "type": "outputs/audio_output",
+      "pos": [1000, 300],
+      "size": [180, 160],
       "properties": {
+        "output_source": "daily",
         "audio_out_enabled": true,
         "audio_out_is_live": true,
-        "audio_out_sample_rate": 16000,
-        "audio_out_channels": 1,
         "audio_out_bitrate": 96000
       }
     }
   ],
   "links": [
     [1, 1, 0, 2, 0, "audio"],
-    [2, 2, 0, 3, 0, "audio"],
-    [3, 3, 0, 5, 2, "string"],
-    [4, 4, 0, 5, 1, "string"],
-    [5, 5, 0, 6, 0, "string"],
-    [6, 6, 0, 7, 0, "audio"]
+    [2, 2, 0, 4, 2, "string"],
+    [3, 3, 0, 4, 1, "string"],
+    [4, 4, 0, 5, 0, "string"],
+    [5, 5, 0, 6, 0, "audio"]
   ],
   "groups": [],
   "config": {},
