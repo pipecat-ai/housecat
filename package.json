@@ -4,7 +4,9 @@
   "description": "",
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "lint": "eslint --ext .js,.ts,.vue src",
+    "lint:fix": "eslint --ext .js,.ts,.vue src --fix"
   },
   "keywords": [],
   "author": "",
