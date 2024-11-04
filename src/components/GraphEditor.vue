@@ -110,10 +110,10 @@ export default defineComponent({
       for (let nn in graph.nodes) {
         let n = graph.nodes[nn];
         let tmp = {};
-        let asdf = JSON.stringify(n.properties);
         tmp.id = n.id;
         tmp.inputs = n.inputs;
         tmp.pos = n.pos;
+        tmp.size = n.size;
         tmp.properties = n.properties;
         tmp.type = n.type;
 
