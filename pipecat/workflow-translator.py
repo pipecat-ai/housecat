@@ -1,0 +1,1 @@
+from ..workflow_mapping import get_processor_class
