@@ -1,6 +1,5 @@
 import { LiteGraph } from '@comfyorg/litegraph';
 import { LLMNode } from './LLMNode';
-import { TextToSpeechNode } from './TextToSpeechNode';
 import { AudioInputNode } from './AudioInputNode';
 import { TextInputNode } from './TextInputNode';
 import { AudioOutputNode } from './AudioOutputNode';
@@ -12,7 +11,6 @@ const INPUTS = 'inputs';
 const OUTPUTS = 'outputs';
 
 LiteGraph.registerNodeType(`${PROCESSORS}/llm`, LLMNode);
-LiteGraph.registerNodeType(`${PROCESSORS}/text_to_speech`, TextToSpeechNode);
 LiteGraph.registerNodeType(`${INPUTS}/audio_input`, AudioInputNode);
 LiteGraph.registerNodeType(`${INPUTS}/text_input`, TextInputNode);
 LiteGraph.registerNodeType(`${OUTPUTS}/audio_output`, AudioOutputNode);
