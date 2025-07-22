@@ -1,3 +1,5 @@
+> archiving this for the foreseeable future.
+
 # Housecat
 Housecat is the front end for pipecat. WIP.
 
